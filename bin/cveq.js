@@ -1,8 +1,17 @@
 #!/usr/bin/env node
 
+import dns from 'node:dns';
+// Ensure IPv4 first on platforms (e.g. Windows) where IPv6 routes can blackhole
+try {
+  dns.setDefaultResultOrder('ipv4first');
+} catch {
+  // Gracefully fallback on older runtimes
+}
+
 import { validateCveId } from '../src/utils/validator.js';
 import { bold, cyan, green, yellow, red, dim, gray } from '../src/formatters/ansi.js';
 import { fetchCveRecord } from '../src/api/cve.js';
+import { searchGithubPocs } from '../src/api/github.js';
 import { formatReport } from '../src/formatters/report.js';
 
 const VERSION = '0.1.0';
@@ -85,15 +94,23 @@ async function main() {
   const cveId = validation.cveId;
   const isSave = args.includes('--save');
 
-  // Fetch official CVE record
-  const cveResult = await fetchCveRecord(cveId);
+  // Fetch official CVE record and GitHub PoCs concurrently
+  const [cveResult, pocResult] = await Promise.all([
+    fetchCveRecord(cveId),
+    searchGithubPocs(cveId)
+  ]);
+
   if (!cveResult.success) {
     console.error(red(cveResult.error));
     process.exit(1);
   }
 
-  // Render report
-  const reportOutput = formatReport({ cve: cveResult.data });
+  // Render complete report
+  const reportOutput = formatReport({
+    cve: cveResult.data,
+    poc: pocResult
+  });
+
   process.stdout.write(reportOutput);
 
   if (isSave) {

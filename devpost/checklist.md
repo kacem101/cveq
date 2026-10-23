@@ -29,7 +29,7 @@ Build mode: fast
   Learner check: Run `node bin/cveq.js CVE-2024-21762` and observe the terminal layout, CVSS severity badge, and wrapping.
   Commit: `Add official CVE.org data fetcher and terminal report renderer`
 
-- [ ] **3. Live GitHub PoC Discovery & 403 Rate-Limit Handling**
+- [x] **3. Live GitHub PoC Discovery & 403 Rate-Limit Handling**
   Becomes usable: The vulnerability report now automatically discovers and displays top 5 star-ranked GitHub PoC repositories concurrently, or warns cleanly if rate-limited.
   Why now: Delivers the unique kernel that sets `cveq` apart from generic CVE search tools, completing the live triage view.
   PRD ref: `prd.md > 3. Public GitHub PoC Discovery`
