@@ -181,6 +181,9 @@ export async function fetchCveRecord(cveId, timeoutMs = DEFAULT_TIMEOUT_MS) {
     const cna = (json.containers && json.containers.cna) || {};
     const adpList = (json.containers && json.containers.adp) || [];
 
+    const metadata = json.cveMetadata || {};
+    const published = metadata.datePublished ? metadata.datePublished.slice(0, 10) : 'Unknown';
+
     const summary = extractDescription(cna.descriptions);
     const { severity, score } = extractCvss(cna, adpList);
     const { items: affected, moreCount: affectedMoreCount } = extractAffected(cna.affected);
@@ -192,6 +195,7 @@ export async function fetchCveRecord(cveId, timeoutMs = DEFAULT_TIMEOUT_MS) {
         cveId,
         severity,
         score,
+        published,
         summary,
         affected,
         affectedMoreCount,

@@ -51,15 +51,14 @@ export function wordWrap(text, maxWidth, indent = '') {
 export function formatReport({ cve, poc = null }) {
   const sections = [];
 
-  // 1. Header Banner
+  // 1. Header Banner & Published Date
   const badge = formatSeverityBadge(cve.severity, cve.score);
   sections.push(`\n${bold(white(cve.cveId))}  ${badge}`);
+  if (cve.published) {
+    sections.push(gray(`Published: ${cve.published}`));
+  }
 
-  // 2. Vulnerability Description
-  sections.push(`\n${bold('Description:')}`);
-  sections.push(wordWrap(cve.summary, null, '  '));
-
-  // 3. Affected Products
+  // 2. Affected Products
   sections.push(`\n${bold('Affected Products:')}`);
   if (cve.affected && cve.affected.length > 0) {
     for (const prod of cve.affected) {
@@ -71,6 +70,10 @@ export function formatReport({ cve, poc = null }) {
   } else {
     sections.push(gray('  None specified in official record'));
   }
+
+  // 3. Vulnerability Description
+  sections.push(`\n${bold('Description:')}`);
+  sections.push(wordWrap(cve.summary, null, '  '));
 
   // 4. Official References
   sections.push(`\n${bold('Official References:')}`);

@@ -18,6 +18,7 @@ test('formatReport generates complete report with severity badge and wrapped sum
     cveId: 'CVE-2024-21762',
     severity: 'CRITICAL',
     score: 9.8,
+    published: '2024-02-09',
     summary: 'An out-of-bounds write vulnerability in FortiOS allows a remote unauthenticated attacker to execute arbitrary code.',
     affected: ['Fortinet FortiOS', 'Fortinet FortiProxy'],
     affectedMoreCount: 0,
@@ -27,6 +28,7 @@ test('formatReport generates complete report with severity badge and wrapped sum
   const output = formatReport({ cve });
   assert.match(output, /CVE-2024-21762/);
   assert.match(output, /CRITICAL/);
+  assert.match(output, /Published: 2024-02-09/);
   assert.match(output, /Fortinet FortiOS/);
   assert.match(output, /FG-IR-24-015/);
 });

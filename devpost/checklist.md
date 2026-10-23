@@ -19,7 +19,7 @@ Build mode: fast
   Learner check: Run `node bin/cveq.js` and `node bin/cveq.js 2024-21762` in your Windows terminal to verify clean, legible text without raw escape sequences.
   Commit: `Initialize cveq CLI with TTY color safety and input validation`
 
-- [ ] **2. Official CVE.org Record Fetching & Formatted Terminal Report**
+- [x] **2. Official CVE.org Record Fetching & Formatted Terminal Report**
   Becomes usable: Running `cveq CVE-2024-21762` fetches live CVE JSON 5.0 data from CVE.org and prints a complete, word-wrapped, ANSI-colored vulnerability report with CVSS badge, affected products, and references in under 5 seconds.
   Why now: Implements the core vulnerability lookup engine and delivers the primary informational value of the tool.
   PRD ref: `prd.md > 2. Vulnerability Data Aggregation`, `prd.md > Terminal Interaction Surfaces (3)`
@@ -51,7 +51,7 @@ Build mode: fast
 
 ## Hands-on Checkpoints
 
-- [ ] Early usable behavior explored — Slice 2 (live terminal CVE report)
+- [x] Early usable behavior explored — Slice 2 (live terminal CVE report)
 - [ ] Final kick-the-tires exploration and feedback completed
 
 ## Final Review
