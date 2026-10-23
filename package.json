@@ -1,0 +1,25 @@
+{
+  "name": "cveq",
+  "version": "0.1.0",
+  "description": "Fast, zero-dependency CLI triage tool for cybersecurity vulnerabilities",
+  "type": "module",
+  "bin": {
+    "cveq": "./bin/cveq.js"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "cve",
+    "cybersecurity",
+    "triage",
+    "poc",
+    "security",
+    "ctf"
+  ],
+  "author": "kacem101",
+  "license": "MIT"
+}
