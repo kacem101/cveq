@@ -2,6 +2,8 @@
 
 import { validateCveId } from '../src/utils/validator.js';
 import { bold, cyan, green, yellow, red, dim, gray } from '../src/formatters/ansi.js';
+import { fetchCveRecord } from '../src/api/cve.js';
+import { formatReport } from '../src/formatters/report.js';
 
 const VERSION = '0.1.0';
 
@@ -83,8 +85,20 @@ async function main() {
   const cveId = validation.cveId;
   const isSave = args.includes('--save');
 
-  // Slice 1: Scaffold & Validation placeholder confirmation
-  console.log(`${green('✓')} Valid CVE ID: ${bold(cveId)} (Normalized) ${isSave ? dim('[--save enabled]') : ''}`);
+  // Fetch official CVE record
+  const cveResult = await fetchCveRecord(cveId);
+  if (!cveResult.success) {
+    console.error(red(cveResult.error));
+    process.exit(1);
+  }
+
+  // Render report
+  const reportOutput = formatReport({ cve: cveResult.data });
+  process.stdout.write(reportOutput);
+
+  if (isSave) {
+    console.log(dim(`Note: --save will be connected in Slice 4.`));
+  }
 }
 
 main().catch((err) => {

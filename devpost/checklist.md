@@ -9,7 +9,7 @@ Build mode: fast
 
 ## Slices
 
-- [ ] **1. Project Scaffold, Windows/TTY Color Safety, and Input Normalization**
+- [x] **1. Project Scaffold, Windows/TTY Color Safety, and Input Normalization**
   Becomes usable: The executable CLI entrypoint runs cleanly in the Windows terminal, displays compact help on no arguments or `--help`, and normalizes/validates CVE inputs with TTY-guarded ANSI colors without throwing escape errors.
   Why now: Bootstraps the project (`package.json`, CLI router, zero-dependency ANSI wrapper, regex validator) and proves Windows Terminal color safety immediately before adding network calls.
   PRD ref: `prd.md > Terminal Interaction Surfaces`, `prd.md > 1. Input Normalization and Validation`, `prd.md > Look and Feel`
