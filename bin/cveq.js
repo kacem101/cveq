@@ -13,6 +13,8 @@ import { bold, cyan, green, yellow, red, dim, gray } from '../src/formatters/ans
 import { fetchCveRecord } from '../src/api/cve.js';
 import { searchGithubPocs } from '../src/api/github.js';
 import { formatReport } from '../src/formatters/report.js';
+import { saveEntry, listEntries } from '../src/journal/manager.js';
+import { formatJournalTable } from '../src/formatters/table.js';
 
 const VERSION = '0.1.0';
 
@@ -80,12 +82,19 @@ async function main() {
   }
 
   if (firstArg === 'journal') {
-    console.log(dim('Journal command: will be connected in Slice 4.'));
+    const entries = await listEntries();
+    if (!entries || entries.length === 0) {
+      console.log('Journal is empty — run cveq <CVE-ID> --save to start your research log.');
+      process.exit(0);
+    }
+    const tableOutput = formatJournalTable(entries);
+    process.stdout.write(tableOutput.endsWith('\n') ? tableOutput : tableOutput + '\n');
     process.exit(0);
   }
 
   // CVE Lookup
-  const validation = validateCveId(firstArg);
+  const cveArg = args.find((a) => !a.startsWith('-')) || firstArg;
+  const validation = validateCveId(cveArg);
   if (!validation.valid) {
     console.error(red(validation.error));
     process.exit(1);
@@ -114,7 +123,14 @@ async function main() {
   process.stdout.write(reportOutput);
 
   if (isSave) {
-    console.log(dim(`Note: --save will be connected in Slice 4.`));
+    await saveEntry({
+      cveId: cveResult.data.cveId,
+      severity: cveResult.data.severity,
+      score: cveResult.data.score,
+      summary: cveResult.data.summary,
+      pocs: pocResult?.items || []
+    });
+    console.log(green(`✓ ${cveId} saved to ~/.cveq/journal.md`));
   }
 }
 

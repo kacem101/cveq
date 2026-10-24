@@ -39,7 +39,7 @@ Build mode: fast
   Learner check: Run `node bin/cveq.js 2024-21762` and check the PoC links and star counts.
   Commit: `Add concurrent GitHub PoC discovery with rate-limit safety`
 
-- [ ] **4. Obsidian Markdown Research Journal (--save & cveq journal)**
+- [x] **4. Obsidian Markdown Research Journal (--save & cveq journal)**
   Becomes usable: The user can append lookups to `~/.cveq/journal.md` using `--save` and view past lookups in a 4-column ASCII table using `cveq journal`.
   Why now: Closes the user loop and finishes the entire proof-of-concept feature set described in the PRD and Spec.
   PRD ref: `prd.md > 4. Research Journal Management (~/.cveq/journal.md)`, `prd.md > Terminal Interaction Surfaces (4)`

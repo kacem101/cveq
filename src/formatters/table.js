@@ -29,7 +29,7 @@ export function formatJournalTable(entries) {
 
   const dateWidth = 10;
   const cveWidth = 16;
-  const sevWidth = 12;
+  const sevWidth = 20;
   const termWidth = (process.stdout && process.stdout.columns) || 80;
   // Calculate remaining width for summary (min 20)
   const sumWidth = Math.max(20, termWidth - (dateWidth + cveWidth + sevWidth + 10));
@@ -42,7 +42,7 @@ export function formatJournalTable(entries) {
   const rows = entries.map((e) => {
     const d = pad(e.date || '', dateWidth);
     const c = pad(e.cveId || '', cveWidth);
-    const s = pad(e.severity || 'NOT SCORED', sevWidth);
+    const s = pad(truncate(e.severity || 'NOT SCORED', sevWidth), sevWidth);
     const sum = pad(truncate(e.summary || '', sumWidth), sumWidth);
     return `  ${d} | ${c} | ${s} | ${sum}`;
   });

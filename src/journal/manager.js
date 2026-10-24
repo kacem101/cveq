@@ -123,8 +123,8 @@ export async function listEntries(customPath = null) {
 
   if (!content.trim()) return [];
 
-  // Split into sections by header: ## YYYY-MM-DD — CVE-XXXX-YYYY
-  const entryRegex = /##\s*(\d{4}-\d{2}-\d{2})\s*—\s*(CVE-\d{4}-\d{4,})/g;
+  // Split into sections by header: ## YYYY-MM-DD — CVE-XXXX-YYYY (tolerating em-dash, en-dash, or hyphen)
+  const entryRegex = /##\s*(\d{4}-\d{2}-\d{2})\s*[—–-]\s*(CVE-[\w-]+)/gi;
   const matches = [...content.matchAll(entryRegex)];
 
   if (matches.length === 0) return [];
@@ -136,16 +136,16 @@ export async function listEntries(customPath = null) {
 
     const match = matches[i];
     const date = match[1];
-    const cveId = match[2];
+    const cveId = match[2].toUpperCase();
 
     const startIndex = match.index + match[0].length;
     const endIndex = i + 1 < matches.length ? matches[i + 1].index : content.length;
     const body = content.slice(startIndex, endIndex);
 
-    // Extract fields tolerantly
-    const sevMatch = body.match(/-\s*\*\*Severity:\*\*\s*(.+)/i);
-    const sumMatch = body.match(/-\s*\*\*Summary:\*\*\s*(.+)/i);
-    const pocMatch = body.match(/-\s*\*\*Top PoC:\*\*\s*(.+)/i);
+    // Extract fields tolerantly (accepting - or * bullets, and case-insensitive)
+    const sevMatch = body.match(/[-*]\s*\*\*Severity:\*\*\s*(.+)/i);
+    const sumMatch = body.match(/[-*]\s*\*\*Summary:\*\*\s*(.+)/i);
+    const pocMatch = body.match(/[-*]\s*\*\*Top PoC:\*\*\s*(.+)/i);
 
     entries.push({
       date,
