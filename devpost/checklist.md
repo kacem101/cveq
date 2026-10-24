@@ -52,22 +52,22 @@ Build mode: fast
 ## Hands-on Checkpoints
 
 - [x] Early usable behavior explored — Slice 2 (live terminal CVE report)
-- [ ] Final kick-the-tires exploration and feedback completed
+- [x] Final kick-the-tires exploration and feedback completed
 
 ## Final Review
 
-- [ ] Final review complete — feedback resolved and learner confirms ready to ship
+- [x] Final review complete — feedback resolved and learner confirms ready to ship
 
 ## Code Tour and App Map
 
-- [ ] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
-- [ ] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
-- [ ] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
+- [x] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
+- [x] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
+- [x] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
 
-Activity and evidence: [what actually happened; real document/test/code references; unfinished work if interrupted]
-Route and stops: [actual paths and symbols; guided stops completed, or reference-only route]
-Edit outcome: [tried/kept/reverted/declined/not applicable; verification if changed]
-Reflection: [offered/answered/declined/already covered — personal answer belongs only in the ignored profile]
-Activity mode: [live app and editor, explicit static fallback, focused alternative, prior practice, or recap]
+Activity and evidence: Learner completed and verified the full 7-command test battery (empty state journal, report rendering with Published date, --save prepend, multi-PoC lookup for CVE-2021-44228, clean 404 handling with exit 1, journal ASCII table view, and --help). All 20/20 unit tests green. Learner confirmed all commands behave per PRD under 5s with clean Windows colors and correct exit codes, with zero regressions.
+Route and stops: Reference route in app-map.html: 1. bin/cveq.js (CLI dispatch & IPv4-first DNS), 2. src/api/cve.js & src/api/github.js (concurrent async API fetching with 8s timeouts), 3. src/journal/manager.js (Obsidian-compatible prepend writer and tolerant regex parser).
+Edit outcome: Not applicable (battery passed completely; learner confirmed ready to move to 6-ship without code changes).
+Reflection: Offered optional transfer reflection on plan-first boundary specification.
+Activity mode: Brief evidence-based recap.
 
 ## Revisions

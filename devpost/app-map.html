@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>cveq — Application Map & Architectural Guide</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --border: #30363d;
+      --text: #c9d1d9;
+      --text-bright: #f0f6fc;
+      --accent: #58a6ff;
+      --accent-green: #3fb950;
+      --accent-yellow: #d29922;
+      --accent-red: #f85149;
+      --code-bg: #1f242c;
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f6f8fa;
+        --card-bg: #ffffff;
+        --border: #d0d7de;
+        --text: #24292f;
+        --text-bright: #1f2328;
+        --accent: #0969da;
+        --accent-green: #1a7f37;
+        --accent-yellow: #9a6700;
+        --accent-red: #cf222e;
+        --code-bg: #eaeef2;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      background: var(--bg);
+      color: var(--text);
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    h1, h2, h3 { color: var(--text-bright); }
+    h1 { margin-bottom: 0.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: rgba(88, 166, 255, 0.15);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      margin-bottom: 1rem;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    code {
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      background: var(--code-bg);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    pre code {
+      display: block;
+      padding: 1rem;
+      overflow-x: auto;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .diagram-container {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      text-align: center;
+    }
+    svg text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    details {
+      margin-bottom: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      background: var(--card-bg);
+    }
+    summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--text-bright);
+    }
+    summary:hover { color: var(--accent); }
+    .meta-footer {
+      margin-top: 3rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.85rem;
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+
+  <h1>cveq — Application Map</h1>
+  <div class="badge">Proof of Concept Snapshot &bull; Commit 355783f</div>
+
+  <p>
+    <strong>cveq</strong> is a fast, zero-dependency Node.js CLI triage tool for cybersecurity students, CTF players, and pentesters. It aggregates authoritative vulnerability records from CVE.org and top public Proof-of-Concept exploits from GitHub, formatting everything into an ANSI-colored terminal report and managing an Obsidian-compatible research journal.
+  </p>
+
+  <div class="card">
+    <h2>Architecture Overview</h2>
+    <p>The entire application runs natively on Node.js 18+ with zero third-party runtime dependencies. The flow of data is strictly deterministic, concurrent, and non-blocking:</p>
+    <ul>
+      <li><strong>CLI Dispatch:</strong> <code>bin/cveq.js</code> parses arguments, flags (<code>--save</code>, <code>--help</code>), and commands (<code>journal</code>).</li>
+      <li><strong>Validation:</strong> <code>src/utils/validator.js</code> enforces <code>^CVE-\d{4}-\d{4,}$</code> and normalizes loose inputs (e.g. <code>2024-21762</code>).</li>
+      <li><strong>Concurrent Ingestion:</strong> <code>src/api/cve.js</code> (CVE.org) and <code>src/api/github.js</code> (GitHub Search API) fetch concurrently via <code>Promise.all()</code> with 8s timeouts.</li>
+      <li><strong>Rendering:</strong> <code>src/formatters/report.js</code> wraps text and applies TTY-safe ANSI severity badges.</li>
+      <li><strong>Persistence:</strong> <code>src/journal/manager.js</code> prepends newest entries directly under the header in <code>~/.cveq/journal.md</code>.</li>
+    </ul>
+  </div>
+
+  <h2>System Journey Diagram</h2>
+  <div class="diagram-container">
+    <svg viewBox="0 0 780 220" width="100%" height="220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="cveq architecture flow diagram">
+      <!-- Input -->
+      <rect x="10" y="75" width="130" height="70" rx="8" fill="#1f242c" stroke="#58a6ff" stroke-width="2"/>
+      <text x="75" y="105" fill="#f0f6fc" font-size="13" font-weight="bold" text-anchor="middle">CLI Invocation</text>
+      <text x="75" y="125" fill="#8b949e" font-size="11" text-anchor="middle">cveq &lt;CVE&gt; [--save]</text>
+
+      <path d="M 140 110 L 180 110" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow)"/>
+
+      <!-- Router & Validation -->
+      <rect x="180" y="75" width="140" height="70" rx="8" fill="#1f242c" stroke="#30363d" stroke-width="2"/>
+      <text x="250" y="105" fill="#f0f6fc" font-size="13" font-weight="bold" text-anchor="middle">Router &amp; Normalizer</text>
+      <text x="250" y="125" fill="#8b949e" font-size="11" text-anchor="middle">bin/cveq.js &amp; validator.js</text>
+
+      <path d="M 320 95 L 370 55" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow)"/>
+      <path d="M 320 125 L 370 165" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow)"/>
+
+      <!-- Upstream APIs -->
+      <rect x="370" y="20" width="160" height="65" rx="8" fill="#1f242c" stroke="#d29922" stroke-width="2"/>
+      <text x="450" y="47" fill="#f0f6fc" font-size="12" font-weight="bold" text-anchor="middle">CVE.org API v5</text>
+      <text x="450" y="67" fill="#8b949e" font-size="10" text-anchor="middle">cveawg.mitre.org/api/cve</text>
+
+      <rect x="370" y="135" width="160" height="65" rx="8" fill="#1f242c" stroke="#d29922" stroke-width="2"/>
+      <text x="450" y="162" fill="#f0f6fc" font-size="12" font-weight="bold" text-anchor="middle">GitHub Search API</text>
+      <text x="450" y="182" fill="#8b949e" font-size="10" text-anchor="middle">api.github.com/search/repo</text>
+
+      <path d="M 530 55 L 580 95" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow)"/>
+      <path d="M 530 165 L 580 125" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow)"/>
+
+      <!-- Outputs -->
+      <rect x="580" y="75" width="180" height="70" rx="8" fill="#1f242c" stroke="#3fb950" stroke-width="2"/>
+      <text x="670" y="103" fill="#3fb950" font-size="13" font-weight="bold" text-anchor="middle">Dual Output</text>
+      <text x="670" y="122" fill="#8b949e" font-size="11" text-anchor="middle">Terminal stdout &amp; Report</text>
+      <text x="670" y="136" fill="#8b949e" font-size="10" text-anchor="middle">~/.cveq/journal.md (--save)</text>
+
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 8 5 L 0 9 z" fill="#58a6ff" />
+        </marker>
+      </defs>
+    </svg>
+  </div>
+
+  <h2>Reference Code Route</h2>
+  <p>Follow a lookup through the actual implementation files:</p>
+
+  <details open>
+    <summary>Stop 1: Entrypoint &amp; Flow Orchestration &bull; <code>bin/cveq.js</code></summary>
+    <p>
+      The entry point configures IPv4-first DNS (Windows-safe network routing), routes subcommands (<code>journal</code>, <code>--help</code>, <code>--version</code>), validates CVE arguments, and coordinates concurrent fetching via <code>Promise.all([fetchCveRecord, searchGithubPocs])</code>.
+    </p>
+    <p>Search anchor: <code>async function main()</code></p>
+  </details>
+
+  <details>
+    <summary>Stop 2: Vulnerability Record &amp; PoC Discovery &bull; <code>src/api/cve.js</code> &amp; <code>src/api/github.js</code></summary>
+    <p>
+      Pure native <code>fetch</code> clients guarded by 8-second <code>AbortController</code> timeouts. <code>src/api/cve.js</code> traverses CVE JSON 5.0 containers (CNA &amp; ADP) to normalize CVSS metrics, product lists, and references. <code>src/api/github.js</code> searches for un-forked repositories sorted by stars, explicitly trapping HTTP 403 rate-limits to allow partial rendering without crashing.
+    </p>
+    <p>Search anchors: <code>export async function fetchCveRecord</code> &bull; <code>export async function searchGithubPocs</code></p>
+  </details>
+
+  <details>
+    <summary>Stop 3: Journal Prepend &amp; Tolerant Parser &bull; <code>src/journal/manager.js</code> &amp; <code>src/formatters/table.js</code></summary>
+    <p>
+      <code>saveEntry</code> injects newest markdown summaries directly under the <code># cveq Research Journal</code> banner so Obsidian displays recent research immediately. <code>listEntries</code> parses up to 20 historical entries using tolerant regex (<code>[—–-]</code> dashes, <code>[-*]</code> bullets) defaulting missing or malformed fields safely.
+    </p>
+    <p>Search anchors: <code>export async function saveEntry</code> &bull; <code>export async function listEntries</code> &bull; <code>export function formatJournalTable</code></p>
+  </details>
+
+  <div class="card">
+    <h2>To Change This, Start Here</h2>
+    <ul>
+      <li><strong>Change output formatting or colors:</strong> Edit <code>src/formatters/ansi.js</code> (ANSI codes &amp; TTY guards) and <code>src/formatters/report.js</code> (layout structure and wrapping).</li>
+      <li><strong>Adjust API timeouts or upstream queries:</strong> Edit <code>DEFAULT_TIMEOUT_MS</code> in <code>src/api/cve.js</code> and <code>src/api/github.js</code>.</li>
+      <li><strong>Customize Journal layout or Obsidian tags:</strong> Edit <code>formatEntryMarkdown()</code> in <code>src/journal/manager.js</code>.</li>
+      <li><strong>Adjust CLI arguments or add new flags:</strong> Edit <code>bin/cveq.js</code> and update help functions.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>A Practice to Reuse: Plan-First Boundary &amp; Tolerant Contract Specification</h2>
+    <p>
+      During the planning phase (<code>3-prd</code> and <code>4-spec</code>), we explicitly established two critical failure modes before writing code:
+    </p>
+    <ol>
+      <li><strong>Degraded GitHub 403 Rate Limits:</strong> Instead of treating an unauthenticated rate limit as a fatal CLI crash, the spec defined a partial success contract (render full CVE metadata, show friendly hint, exit 0).</li>
+      <li><strong>Tolerant Journal Markdown Ingestion:</strong> Because markdown files can be edited by humans in Obsidian, the spec established an amendment requiring regex parsers to tolerate missing fields and dashed heading variations without crashing.</li>
+    </ol>
+    <p>
+      <strong>Reusable Lesson:</strong> When building CLI tools that interact with third-party rate-limited APIs or local markdown files, specifying your degraded states and fault-tolerant parsing rules in your spec <em>before</em> code eliminates brittle edge cases and avoids rework during implementation.
+    </p>
+  </div>
+
+  <div class="meta-footer">
+    <p><strong>Run cveq:</strong> <code>cveq CVE-2024-21762</code> or <code>cveq journal</code> &bull; <strong>Test suite:</strong> <code>node --test</code> (20/20 passing) &bull; Snapshot based on commit <code>355783f</code>.</p>
+  </div>
+
+</body>
+</html>
